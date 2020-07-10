@@ -63,6 +63,14 @@ def swap_color(color):
     return "white"
 
 
+def border_color(color):
+  if color == "white":
+    return "black"
+
+  if color == "black":
+    return "grey"
+
+
 class piece(object):
   def __init__(self, color, locations, name):
     self.color = color
@@ -70,34 +78,168 @@ class piece(object):
     self.name = name
 
 
-class pawns(piece):
-  def __init__(self, color, locations=False):
+class pawn(piece):
+  def __init__(self, color, location):
     self.color = color
-    self.name = self.color + " pawns"
-    if locations is not False:
-      self.locations = locations
-    
-    # Set pieces to default location
-    else:
-      if color == 'white':
-        self.locations = numpy.zeros((8, 8))
-        self.locations[:, 1] = 1
+    self.name = self.color + " pawn"
+    self.location = location
 
-
-  def moves(board_config):
+  def move(board_config):
     return None
 
   def plot(self, fig, axes):
-    for i in range(8):
-      for j in range(8):
-        if self.locations[i, j] == 1:
-          axes[1].add_artist(plt.Circle([i, j], radius=0.3, zorder=1, color=self.color))
-          axes[1].add_artist(plt.Circle([i, j], radius=0.3, zorder=1, color=swap_color(self.color), fill=False, lw=1))
+    axes[1].add_artist(plt.Circle([self.location[0], self.location[1]], radius=0.3, linewidth=0.3, color=self.color))
+    axes[1].add_artist(plt.Circle([self.location[0], self.location[1]], radius=0.3, linewidth=0.3, color=border_color(self.color), fill=False, lw=1))
 
+
+class rook(piece):
+  def __init__(self, color, location):
+    self.color = color
+    self.name = self.color + " rook"
+    self.location = location
+
+  def move(board_config):
+    return None
+
+  def plot(self, fig, axes):
+    axes[1].add_artist(plt.Rectangle((self.location[0] - 0.3, self.location[1] - 0.3), 0.6, 0.6, linewidth=0.3, color=self.color))
+    axes[1].add_artist(plt.Rectangle((self.location[0] - 0.3, self.location[1] - 0.3), 0.6, 0.6, linewidth=0.3, color=border_color(self.color), fill=False, lw=1))
+
+
+class knight(piece):
+  def __init__(self, color, location):
+    self.color = color
+    self.name = self.color + " knight"
+    self.location = location
+
+  def move(board_config):
+    return None
+
+  def plot(self, fig, axes):
+    shape = [[-0.25, 0.35], [0.25, 0.15], [0.25, -0.35], [-0.25, -0.35]]
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=self.color, linewidth=0.3))
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=border_color(self.color), fill=False, lw=1))
+
+
+class bishop(piece):
+  def __init__(self, color, location):
+    self.color = color
+    self.name = self.color + " knight"
+    self.location = location
+
+  def move(board_config):
+    return None
+
+  def plot(self, fig, axes):
+    shape = [[0, -0.35], [-0.35, 0], [0, 0.35], [0.35, 0]]
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=self.color, linewidth=0.3))
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=border_color(self.color), fill=False, lw=1))
+
+
+class queen(piece):
+  def __init__(self, color, location):
+    self.color = color
+    self.name = self.color + " knight"
+    self.location = location
+
+  def move(board_config):
+    return None
+
+  def plot(self, fig, axes):
+    shape = [[-0.25, -0.35], [-0.4, 0.05], [0, 0.35], [0.4, 0.05], [0.25, -0.35]]
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=self.color, linewidth=0.3))
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=border_color(self.color), fill=False, lw=1))
+
+
+class king(piece):
+  def __init__(self, color, location):
+    self.color = color
+    self.name = self.color + " knight"
+    self.location = location
+
+  def move(board_config):
+    return None
+
+  def plot(self, fig, axes):
+    shape = [[-0.15, -0.4], [-0.15, -0.15], [-0.4, -0.15], [-0.4, 0.15], [-0.15, 0.15], [-0.15, 0.4],
+                  [0.15, 0.4], [0.15, 0.15], [0.4, 0.15], [0.4, -0.15], [0.15, -0.15], [0.15, -0.4]]
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=self.color, linewidth=0.3))
+    axes[1].add_artist(plt.Polygon(numpy.array([[self.location[0] + k[0], self.location[1] + k[1]] for k in shape]), color=border_color(self.color), fill=False, lw=1))
+
+
+class pieces(object):
+  def __init__(self, color, piece_list=False):
+    self.color = color
+    if piece_list is not False:
+      self.piece_list = piece_list
+    
+    else:
+      # Set pieces to default location
+      self.piece_list = []
+      
+      # Add the pawns
+      if self.color == 'white':
+        for i in range(8):
+          self.piece_list.append(pawn('white', [i, 1]))
+
+      else:
+        for i in range(8):
+          self.piece_list.append(pawn('black', [i, 6]))
+
+      # Add the rooks
+      if self.color == 'white':
+        self.piece_list.append(rook('white', [0, 0]))
+        self.piece_list.append(rook('white', [7, 0]))
+
+      else:
+        self.piece_list.append(rook('black', [0, 7]))
+        self.piece_list.append(rook('black', [7, 7]))
+
+      # Add the knights
+      if self.color == 'white':
+        self.piece_list.append(knight('white', [1, 0]))
+        self.piece_list.append(knight('white', [6, 0]))
+
+      else:
+        self.piece_list.append(knight('black', [1, 7]))
+        self.piece_list.append(knight('black', [6, 7]))
+
+      # Add the bishops
+      if self.color == 'white':
+        self.piece_list.append(bishop('white', [2, 0]))
+        self.piece_list.append(bishop('white', [5, 0]))
+
+      else:
+        self.piece_list.append(bishop('black', [2, 7]))
+        self.piece_list.append(bishop('black', [5, 7]))
+
+      # Add the Queen
+      if self.color == 'white':
+        self.piece_list.append(queen('white', [3, 0]))
+
+      if self.color == 'black':
+        self.piece_list.append(queen('black', [3, 7]))
+
+      # Add the King
+      if self.color == 'white':
+        self.piece_list.append(king('white', [4, 0]))
+
+      if self.color == 'black':
+        self.piece_list.append(king('black', [4, 7]))
+
+
+  def plot(self, fig, axes):
+    for piece in self.piece_list:
+      piece.plot(fig, axes)
 
 fig, axes = make_board()
 
-white_pawns = pawns('white')
+white_pieces = pieces('white')
+black_pieces = pieces('black')
 
-white_pawns.plot(fig, axes)
+
+white_pieces.plot(fig, axes)
+black_pieces.plot(fig, axes)
+
+
 plt.show()
